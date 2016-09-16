@@ -1,9 +1,7 @@
-<% make = Make.where(webmotors_id: params[:webmotors_make_id])[0] %>
-<% models = Model.where(make_id: make.id) %>
+<%= link_to t(:back), root_path %>
 
-<a href="/"><< Voltar</a>
 <ul>
-  <% models.each do |model| %>
-    <li><%= model.name %></li>
+  <% @models.each do |model| %>
+    <%= content_tag :li, model.name %>
   <% end %>
 </ul>
