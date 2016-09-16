@@ -1,21 +1,14 @@
 class ModelsController < ApplicationController
+  before_action :set_product, only: [:edit, :update]
+  before_action :sync_models, only: [:index]
+
   def index
-    #search the models
-    uri = URI("http://www.webmotors.com.br/carro/modelos")
+    @models = Make.includes(:models).find_by!(webmotors_id: params[:webmotors_make_id]).models
+  end
 
-    # Make request for Webmotors site
-    make = Make.where(webmotors_id: params[:webmotors_make_id])[0]
+  private
 
-    response = Net::HTTP.post_form(uri, { marca: params[:webmotors_make_id] })
-    models_json = JSON.parse response.body
-
-    # debugger
-
-    # Itera no resultado e grava os modelos que ainda não estão persistidas
-    models_json.each do |json|
-      if Model.where(name: json["Nome"], make_id: make.id).size == 0
-        Model.create(make_id: make.id, name: json["Nome"])
-      end
-    end
+  def sync_models
+    Webmotors::ModelosService.sync! params[:webmotors_make_id]
   end
 end
